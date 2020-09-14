@@ -1,1 +1,1 @@
-This folder contain all the individual coding files. If one wants to run the code of this project as is, a better option is to run one of the complete files in the other folder (called Complete_Files).
+This folder contains all the individual coding files. If one wants to run the code of this project as is, a better option is to run one of the complete files in the other folder (called Complete_Files).

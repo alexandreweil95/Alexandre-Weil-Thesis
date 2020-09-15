@@ -1,4 +1,3 @@
-
 import time
 start = time.time()
 
@@ -17,7 +16,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0";
 
 ## Hack to make other Keras backbones work
 import tensorflow as tf
-import tensorflow.keras.backend as tfback 
+import tensorflow.keras.backend as tfback
 
 print("tf.__version__ is", tf.__version__)
 print("tf.keras.__version__ is:", tf.keras.__version__)
@@ -35,7 +34,6 @@ def _get_available_gpus():
     return [x for x in tfback._LOCAL_DEVICES if 'device:gpu' in x.lower()]
 
 tfback._get_available_gpus = _get_available_gpus
-
 
 
 
@@ -320,7 +318,6 @@ class Feature_pooling(Layer): # For model b). Source: https://github.com/yanyong
         }
         base_config = super(Feature_pooling, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
-
 
 
 
@@ -670,14 +667,7 @@ def embedding_based_net(input_dim, args, weights=None, useMulGpu=False): # Model
     fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='lse', name='fp')(embed) # MIL Pooling then FC (like in MI-Net)
 
     model = Model(inputs=[data_input], outputs=[fp])
-    
-
-    ## Old approach for the last few layers:
-
-    # fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max', name='fp')(embed) # MIL Pooling + FC
-    # out = Last_Sigmoid(output_dim=1, name='FC1_sigmoid')(fp) # FCN
-    # model = Model(inputs=[data_input], outputs=[out])
-    
+        
 
     # model.summary()
     if useMulGpu == True:
@@ -741,18 +731,13 @@ def covid_net(input_dim, args, weights=None, useMulGpu=False): # Model c) in Ils
 
     embed= GlobalAveragePooling2D()(conv5_3_Dropout)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     
     x_mul = multiply([alpha, embed], name='multiply_1')
-    # x_mul = multiply([alpha, embed])
 
     out = Last_Sigmoid(output_dim=1, name='FC1_sigmoid')(x_mul)
     
     model = Model(inputs=[data_input], outputs=[out])
-
-
 
     # model.summary()
     if useMulGpu == True:
@@ -781,17 +766,12 @@ import keras.layers
 from keras.layers import ZeroPadding2D, Add, Input, Activation, AveragePooling2D, GlobalAveragePooling2D, BatchNormalization, Dense, Layer, Dropout, Conv2D, MaxPooling2D, Flatten, multiply
 
 
-from tensorflow.keras import layers # Added
-from keras.layers import Layer # Added
+from tensorflow.keras import layers
+from keras.layers import Layer
 
 import os
 import collections
 import warnings
-
-
-
-# from .. import get_submodules_from_kwargs
-# from ..weights import load_model_weights
 
 backend = None
 layers = None
@@ -1142,7 +1122,6 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     else:
         bn_axis = 1
 
-    # bn_axis = 3 # [HACK] manually added since the image_data_format is 'channels_last'
 
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
@@ -1198,8 +1177,6 @@ def conv_block(input_tensor,
     else:
         bn_axis = 1
 
-    # bn_axis = 3 # [HACK] manually added since the image_data_format is 'channels_last'
-
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
 
@@ -1231,12 +1208,7 @@ def conv_block(input_tensor,
     return x
 
 # ResNet50
-#import tensorflow.keras
 
-# (ResNet is simplified version of Densenet - densenet works very well for segmentation tasks but here we work on image level classification so Resnet is more helpful than DenseNet)
-
-# https://machinelearningmastery.com/how-to-use-transfer-learning-when-developing-convolutional-neural-network-models/
-#from tensorflow.keras.applications.resnet import ResNet50
 
 import tensorflow as tf
 from tensorflow import keras
@@ -1310,8 +1282,6 @@ def covid_ResNet50(input_dim, args, weights=None, useMulGpu=False): # Model c) i
   
     embed= GlobalAveragePooling2D()(x)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     x_mul = multiply([alpha, embed])
 
@@ -1599,8 +1569,6 @@ def covid_InceptionV3(input_dim, args, weights=None, useMulGpu=False): # Model c
 
     embed= GlobalAveragePooling2D()(x)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     x_mul = multiply([alpha, embed])
 
@@ -1639,10 +1607,6 @@ def _tensor_shape(tensor):
 import keras.layers
 from keras.layers import Reshape, add, Permute, Conv2D, Concatenate, ZeroPadding2D, Add, Input, Activation, AveragePooling2D, GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormalization, Dense, Layer, Dropout, Conv2D, MaxPooling2D, Flatten, multiply
 
-# def _tensor_shape(tensor):
-#     return getattr(tensor, '_keras_shape') # Modified since using only keras.layers
-#     # return getattr(tensor, 'tf_keras_shape')
-#     # return getattr(tensor, 'shape')
 
 def squeeze_excite_block(input_tensor, ratio=16):
     """ Create a channel-wise squeeze-excite block
@@ -1788,8 +1752,6 @@ def _resnet_bottleneck_block(input_tensor, filters, k=1, strides=(1, 1)):
     return m
 
 
-# def _create_se_resnet(classes, img_input, include_top, initial_conv_filters, filters,
-#                       depth, width, bottleneck, weight_decay, pooling):
 def covid_SqueezeExcite_ResNet50(img_input, args, weights=None, bottleneck=True, useMulGpu=False): # Model c) in Ilse et. al (2018) with Squeeze-Excite ResNet50 backbone instead of the standard CNN backbone
     """Creates a SE ResNet model with specified parameters
     Args:
@@ -1867,8 +1829,6 @@ def covid_SqueezeExcite_ResNet50(img_input, args, weights=None, bottleneck=True,
 
     embed= GlobalAveragePooling2D()(x)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     x_mul = multiply([alpha, embed])
 
@@ -1888,7 +1848,7 @@ def covid_SqueezeExcite_ResNet50(img_input, args, weights=None, bottleneck=True,
     return parallel_model
 
 
-
+   
 # DenseNet
 
 import keras.layers
@@ -1907,7 +1867,7 @@ def transition_block(x, reduction, name):
     x = BatchNormalization(axis=bn_axis, epsilon=1.001e-5,
                                   name=name + '_bn')(x)
     x = Activation('relu', name=name + '_relu')(x)
-    x = Conv2D(int(backend.int_shape(x)[bn_axis] * reduction), 1, # change to tf.keras.backend?
+    x = Conv2D(int(backend.int_shape(x)[bn_axis] * reduction), 1,
                       use_bias=False,
                       name=name + '_conv')(x)
     x = AveragePooling2D(2, strides=2, name=name + '_pool')(x)
@@ -1989,8 +1949,6 @@ def covid_DenseNet(blocks, input_dim, args, weights=None, useMulGpu=False): # Mo
 
     embed= GlobalAveragePooling2D()(x)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     x_mul = multiply([alpha, embed])
 
@@ -2012,12 +1970,10 @@ def covid_DenseNet(blocks, input_dim, args, weights=None, useMulGpu=False): # Mo
 
 
 
-
 # Squeeze and Excite Inception-ResNet V2
 
 import keras.layers
 from keras.layers import Activation, AveragePooling2D, BatchNormalization, Concatenate, Conv2D, Dense, GlobalAveragePooling2D, GlobalMaxPooling2D, Input, Lambda, MaxPooling2D
-
 
 # Squeeze and Excite block already defined above
 
@@ -2286,8 +2242,6 @@ def covid_SEInceptionResNetV2(input_dim, args, weights=None, useMulGpu=False): #
 
     embed= GlobalAveragePooling2D()(x)
 
-  #  fp = Feature_pooling(output_dim=1, kernel_regularizer=l2(0.0005), pooling_mode='max',
-#                          name='fp')(fc2)
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=True)(embed) # using the defined MIL attention class here
     x_mul = multiply([alpha, embed])
 
@@ -2627,8 +2581,6 @@ def covid_SqueezeExcite_InceptionV3(input_dim, args, weights=None, useMulGpu=Fal
 import numpy as np
 import random
 import threading
-# from .data_aug_op import random_flip_img, random_rotate_img
-#from keras.preprocessing.image import ImageDataGenerator
 import scipy.misc as sci
 
 class threadsafe_iter(object):
@@ -2735,7 +2687,6 @@ class DataGenerator(object):
 
 
 
-
 import random
 import numpy as np
 import cv2
@@ -2788,10 +2739,7 @@ def random_crop(image, crop_size=(400, 400)):
     return aX
 
 
-
-
 destination_folder= '/app/Alex/Images_Destination_Folder'  # Adapt to cluster
-
 
 
 
@@ -2971,14 +2919,6 @@ def categorical_focal_loss(gamma=2., alpha=.25):
 
 
 
-    # To implement more comprehensive metrics: 
-  # Precision, Recall (most important), Sensitivity, Specificity, AUC (plot ROC curves=> very important metric to see how good classifier is). 
-  # Should plot AUC across different number of training bags. 
-  # No need for the F1
-
-# https://keras.io/api/metrics/
-# Plot AUC across different number of training bags: [https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc_crossval.html#sphx-glr-auto-examples-model-selection-plot-roc-crossval-py]
-
 import sklearn
 from sklearn import metrics
 from imblearn.metrics import sensitivity_score
@@ -3067,7 +3007,6 @@ def _get_available_gpus():
           devices = tf.config.list_logical_devices()
           _LOCAL_DEVICES = [x.name for x in devices]
       return [x for x in _LOCAL_DEVICES if 'device:gpu' in x.lower()]
-
 
 
 
@@ -3367,7 +3306,7 @@ def test_eval(model, test_set):
     test_recall_manually = np.zeros((num_test_batch, 1), dtype=float)
 
 
-    for ibatch, batch in enumerate(test_set): # Throwing tracing error      
+    for ibatch, batch in enumerate(test_set):  
         
 #         print('x = batch.shape = ',batch.shape) # To help debug
 #         print('x = batch[0].shape = ',batch[0].shape) # To help debug
@@ -3602,15 +3541,15 @@ if __name__ == "__main__":
 
     args = parse_args() 
 
-    print ('Called with args:') # Not needed in Colab notebook
-    print (args) # Not needed in Colab notebook
+    print ('Called with args:')
+    print (args)
 
-    input_dim = (224,224,1) # [TBU] Change depending on dataset?
+    input_dim = (224,224,1)
 
     run = 1
     n_folds = 5
     acc = np.zeros((run, n_folds), dtype=float)
-    # data_path = './data/data/' # [#TBU]
+    # data_path = './data/data/'
     data_path = destination_folder
 
     for irun in range(run):

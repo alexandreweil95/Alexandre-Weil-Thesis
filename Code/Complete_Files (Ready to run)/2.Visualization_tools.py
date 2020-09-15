@@ -1,8 +1,6 @@
-
- 
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
- 
+
 # Select GPU to use - The GPU ids are: "0", "1" or "2" or "3";
 os.environ["CUDA_VISIBLE_DEVICES"]="0"; 
 
@@ -1636,12 +1634,10 @@ def generate_batch(path, mode=None):
                 img.append(np.expand_dims(np.expand_dims(img_data,2),0))
                 name_img.append(each_img.split('/')[-1])
             if label == 1:
-                curr_label = np.ones(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.ones(len(img), dtype=object) # Use this one instead?
+                curr_label = np.ones(len(img), dtype=np.uint8)
                 num_pos += 1
             else:
-                curr_label = np.zeros(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.zeros(len(img), dtype=object) # Use this one instead?                             
+                curr_label = np.zeros(len(img), dtype=np.uint8)
                 num_neg += 1
             stack_img = np.concatenate(img, axis=0)
             bags.append((stack_img, curr_label, name_img))
@@ -1925,8 +1921,8 @@ def model_training(input_dim, dataset, irun, ifold):
     dirc= args["model_id"]+'/data'
     if not os.path.exists(dirc):
         os.mkdir(dirc)
-#     np.save(os.path.join(dirc, 'fold_{}_train_bags.npy'.format(ifold)), train_set) # [27th July - Commented out since not needed]
-    np.save(os.path.join(dirc, 'fold_{}_test_bags.npy'.format(ifold)), test_set) # Modify this for n-fold training?
+#     np.save(os.path.join(dirc, 'fold_{}_train_bags.npy'.format(ifold)), train_set)
+    np.save(os.path.join(dirc, 'fold_{}_test_bags.npy'.format(ifold)), test_set)
     #fig, ax = plt.subplots()
     #ax.set_axis_off()
     #for ibatch, batch in enumerate(train_set):
@@ -2004,80 +2000,9 @@ print('Model is now ready to train!')
 
 
 
-
 import numpy as np
 from keras.models import Model
 import os
-
-
-# def parse_args():
-#     """Parse input arguments.
-#     Parameters
-#     -------------------
-#     No parameters.
-#     Returns
-#     -------------------
-#     args: argparser.Namespace class object
-#         An argparse.Namespace class object contains experimental hyper-parameters.
-#     """
-#     parser = argparse.ArgumentParser(description='Train a Attention-based Deep MIL')
-#     parser.add_argument('--lr', dest='init_lr',
-#                         help='initial learning rate',
-#                         default=1e-4, type=float)
-#     parser.add_argument('--decay', dest='weight_decay',
-#                         help='weight decay',
-#                         default=0.0005, type=float)
-#     parser.add_argument('--momentum', dest='momentum',
-#                         help='momentum',
-#                         default=0.9, type=float)
-#     parser.add_argument('--epoch', dest='max_epoch',
-#                         help='number of epoch to train',
-#                         default=100, type=int)
-#     parser.add_argument('--useGated', dest='useGated',
-#                         help='use Gated Attention',
-#                         default=False, type=int)
-#     parser.add_argument('--train_bags_samples', dest='train_bags_samples',
-#                         help='path to save sampled training bags',
-#                         default='./save_train_bags', type=str)
-#     parser.add_argument('--test_bags_samples', dest='test_bags_samples',
-#                         help='path to save test bags',
-#                         default='./test_results', type=str)
-
-#     # if len(sys.argv) == 1:
-#     #     parser.print_help()
-#     #     sys.exit(1)
-
-
-
-#     ### Below section has been added to the code [Remove?? ]
-#     args = dict(init_lr = 1e-4, 
-#     weight_decay = 0.0005,
-#     momentum = 0.9,
-#     max_epoch=50, # Keep on 100 for experiments
-#     useGated = True, 
-# #     train_bags_samples = destination_folder + '/save_train_bags_Visualisation',
-# #     test_bags_samples = destination_folder + '/test_results_Visualisation',
-#     train_bags_samples = model_saving_folder + '/save_train_bags_Visualisation',
-#     test_bags_samples = model_saving_folder + '/test_results_Visualisation_outputs',
-# #      os.path.exists(args["model_id"]
-                
-#     model_id_visualisation = model_saving_folder +'/Visualisation') 
-
-#     if not os.path.exists(args["model_id_visualisation"]):
-#         os.mkdir(args["model_id_visualisation"])
-#     if not os.path.exists(args["train_bags_samples"]):
-#         os.mkdir(args["train_bags_samples"])
-#     if not os.path.exists(args["test_bags_samples"]):
-#         os.mkdir(args["test_bags_samples"])
-#     if not os.path.exists(args["model_id"] + "/Saved_model"):
-#         os.mkdir(args["model_id"] + "/Saved_model")
-
-#     ### End of added section
-    
-#     return args
-
-
-
 
 def test_eval(model, test_set):
     """Evaluate on testing set.
@@ -2112,7 +2037,6 @@ def test_eval(model, test_set):
 #         print('y = batch[1].shape = ',batch[1].shape) # To help debug
 #         print('y = batch[1] = ',batch[1]) # To help debug
 
-#         result = model.test_on_batch(x=batch[0], y=batch[1]) # Problematic- Throwing an error
         result = model.test_on_batch(x=batch[0], y=batch[1][:1]) # y=batch[1] is a vector of all ones or all zeros for the bag. Take first element to have the right dimension to compare to y_true
 
 #         result = model.test_on_batch(x=batch[0], y=np.mean(batch[1],keepdims=True))
@@ -2135,27 +2059,17 @@ def test_eval(model, test_set):
 
 
 args = parse_args()
-# print('Called with args:')
-# print(args)
 
 input_dim = (224,224,1)
-
-# test_set = np.load('/content/drive/My Drive/Thesis (Aladdin)/Images Destination Folder/child_only/data/fold_4_test_bags.npy', allow_pickle=True) # To modify
-
-
 
 test_set = np.load('/app/Alex/model_saving_folder/Covid_Net_ResNet18/data/fold_1_test_bags.npy', allow_pickle=True) # To modify
 
 checkpoint_path='/app/Alex/model_saving_folder/Covid_Net_ResNet18/Saved_model/hd5_files/_Batch_size_1fold_1.ckpt'
-
-# checkpoint_path = args["model_id"]+"/Saved_model/" + "_Batch_size_" + str(batch_size) + "fold_" + str(ifold) + ".ckpt"
-
-
     
 model = covid_ResNet18(input_dim, args, useMulGpu=False)  # model c) with ResNet18 backbone
 
 
-model.load_weights(checkpoint_path) # change it to checkpoint path as per: https://www.tensorflow.org/tutorials/keras/save_and_load
+model.load_weights(checkpoint_path) # checkpoint path as per: https://www.tensorflow.org/tutorials/keras/save_and_load
 
 test_loss, test_acc, test_precision, test_recall, test_specificity, test_AUC = test_eval(model, test_set) # Gives test loss and accuracy
 
@@ -2223,7 +2137,7 @@ def show_images(images, cols = 1, titles = None, ibatch=None, batch=None, interm
     plt.cla()
     plt.close()
     fig = plt.figure()
-    for n, (image, title) in enumerate(zip(images, titles)): # change?
+    for n, (image, title) in enumerate(zip(images, titles)):
         a = fig.add_subplot(cols, np.ceil(n_images/float(cols)), n + 1)
         if image.ndim == 2:
             plt.gray()
@@ -2660,7 +2574,7 @@ if __name__ == "__main__":
     for i, c, label in zip(target_ids, colors, target_names):
 #         plt.scatter(tsne_2d[labels == i, 0], tsne_2d[labels == i, 1], c=c, label=label)
 
-        plt.scatter(tsne_2d[labels == i, 0], tsne_2d[labels == i, 1], c=c, label=label, marker="+", s=50) # Added - TRY THIS instead of line above?
+        plt.scatter(tsne_2d[labels == i, 0], tsne_2d[labels == i, 1], c=c, label=label, marker="+", s=50)
 
 #     for i, txt in enumerate(subject_id): # Remove to remove annotation
 #         ax.annotate(txt, (tsne_2d[i,0], tsne_2d[i,1]))
@@ -2744,7 +2658,6 @@ if __name__ == "__main__":
 
 
 ### End of "vis_attention.py" ####
-
 
 
 print('end of file')

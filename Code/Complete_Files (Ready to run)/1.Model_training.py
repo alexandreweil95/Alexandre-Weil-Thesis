@@ -3148,12 +3148,10 @@ def generate_batch(path, mode=None):
                 img.append(np.expand_dims(np.expand_dims(img_data,2),0))
                 name_img.append(each_img.split('/')[-1])
             if label == 1:
-                curr_label = np.ones(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.ones(len(img), dtype=object) # Use this one instead?
+                curr_label = np.ones(len(img), dtype=np.uint8)
                 num_pos += 1
             else:
-                curr_label = np.zeros(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.zeros(len(img), dtype=object) # Use this one instead?                             
+                curr_label = np.zeros(len(img), dtype=np.uint8)
                 num_neg += 1
             stack_img = np.concatenate(img, axis=0)
             bags.append((stack_img, curr_label, name_img))
@@ -3450,8 +3448,8 @@ def model_training(input_dim, dataset, irun, ifold):
     dirc= args["model_id"]+'/data'
     if not os.path.exists(dirc):
         os.mkdir(dirc)
-#     np.save(os.path.join(dirc, 'fold_{}_train_bags.npy'.format(ifold)), train_set) # [27th July - Commented out since not needed]
-    np.save(os.path.join(dirc, 'fold_{}_test_bags.npy'.format(ifold)), test_set) # Modify this for n-fold training?
+#     np.save(os.path.join(dirc, 'fold_{}_train_bags.npy'.format(ifold)), train_set)
+    np.save(os.path.join(dirc, 'fold_{}_test_bags.npy'.format(ifold)), test_set)
     #fig, ax = plt.subplots()
     #ax.set_axis_off()
     #for ibatch, batch in enumerate(train_set):

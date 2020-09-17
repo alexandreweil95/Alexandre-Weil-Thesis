@@ -92,12 +92,12 @@ def parse_args():
     args = dict(init_lr = 1e-1, 
     weight_decay = 0.0005,
     momentum = 0.9,
-    max_epoch=50, # Keep modify it depending on the model and how quickly it overfits
+    max_epoch=50,
     useGated = True,             
                              
     train_bags_samples = model_saving_folder + '/save_train_bags',
     test_bags_samples = model_saving_folder + '/test_results',
-    model_id = model_saving_folder +'/Simple_ConvNet') # Need to modify this since we changed dataset
+    model_id = model_saving_folder +'/Simple_ConvNet') # Need to modify this for every model, so that the results of different models get saved to different folders
  
     if not os.path.exists(args["model_id"]):
         os.mkdir(args["model_id"])
@@ -149,12 +149,10 @@ def generate_batch(path, mode=None):
                 img.append(np.expand_dims(np.expand_dims(img_data,2),0))
                 name_img.append(each_img.split('/')[-1])
             if label == 1:
-                curr_label = np.ones(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.ones(len(img), dtype=object) # Use this one instead?
+                curr_label = np.ones(len(img), dtype=np.uint8)
                 num_pos += 1
             else:
-                curr_label = np.zeros(len(img), dtype=np.uint8) # deprecated
-#                 curr_label = np.zeros(len(img), dtype=object) # Use this one instead?                             
+                curr_label = np.zeros(len(img), dtype=np.uint8)
                 num_neg += 1
             stack_img = np.concatenate(img, axis=0)
             bags.append((stack_img, curr_label, name_img))
@@ -363,22 +361,12 @@ def train_eval(model, train_set, irun, ifold):
     val_gen = DataGenerator(batch_size=1, shuffle=False).generate(model_val_set)
 
     
-    ### Path for tf.keras: https://www.tensorflow.org/tutorials/keras/save_and_load
-#     checkpoint_path = "training_1/cp.ckpt" 
-
     checkpoint_path = args["model_id"]+"/Saved_model/" + "hd5_files/" + "_Batch_size_" + str(batch_size) + "fold_" + str(ifold) + ".ckpt"
     
     checkpoint_dir = os.path.dirname(checkpoint_path)
 
     
     model_name = args["model_id"]+"/Saved_model/" + "_Batch_size_" + str(batch_size) + "fold_" + str(ifold) + "best.hd5"
-
-
-
-#     checkpoint_fixed_name = ModelCheckpoint(model_name,
-#                                             monitor='val_loss', verbose=1, save_best_only=True,
-#                                             save_weights_only=True, mode='auto', save_freq='epoch')
-
 
     checkpoint_fixed_name = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, monitor='val_loss',verbose=1,save_best_only=True, save_weights_only=True, mode='auto', save_freq='epoch')
 

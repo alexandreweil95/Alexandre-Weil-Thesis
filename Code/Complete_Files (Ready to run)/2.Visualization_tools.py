@@ -1580,7 +1580,7 @@ def parse_args():
     train_bags_samples = model_saving_folder + '/save_train_bags',
     test_bags_samples = model_saving_folder + '/test_results',
     model_id = model_id,
-    test_visualisation = model_id + '/test_results_Visualisation_outputs' + '/Show_intra') # Need to modify this since we changed dataset
+    test_visualisation = model_id + '/test_results_Visualisation_outputs' + '/Show_intra') # Modify this for every visualisation tool (so that they get saved in different folders)
  
     if not os.path.exists(args["model_id"]):
         os.mkdir(args["model_id"])
